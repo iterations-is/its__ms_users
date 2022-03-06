@@ -1,5 +1,7 @@
 {
   "name": "its__ms_users",
+  "version": "0.0.1",
+  "description": "MS Users - user management",
   "license": "MIT",
   "author": {
     "name": "Sergey Dunaevskiy",
@@ -35,20 +37,29 @@
     "prepare": "husky install"
   },
   "dependencies": {
+    "@prisma/client": "3.10.0",
     "amqplib": "^0.8.0",
+    "axios": "^0.26.0",
+    "bcryptjs": "^2.4.3",
     "dotenv": "^14.3.2",
-    "express": "^4.17.2"
+    "express": "^4.17.2",
+    "joi": "^17.6.0",
+    "lodash": "^4.17.21"
   },
   "devDependencies": {
     "@babel/core": "^7.17.5",
     "@babel/preset-env": "^7.16.11",
     "@babel/preset-typescript": "^7.16.7",
     "@types/amqplib": "^0.8.2",
+    "@types/bcryptjs": "^2.4.2",
     "@types/express": "^4.17.13",
     "@types/jest": "^27.4.0",
+    "@types/joi": "^17.2.3",
+    "@types/lodash": "^4.14.179",
     "@types/node": "^17.0.13",
     "@typescript-eslint/eslint-plugin": "^5.10.1",
     "@typescript-eslint/parser": "^5.10.1",
+    "encoding": "^0.1.13",
     "eslint": "^8.8.0",
     "eslint-config-prettier": "^8.3.0",
     "husky": "^7.0.4",

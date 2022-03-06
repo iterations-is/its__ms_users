@@ -26,6 +26,9 @@ module.exports = {
 	externalsPresets: {
 		node: true,
 	},
+	externals: {
+		_http_common: 'commonjs2 _http_common',
+	},
 	optimization: {
 		splitChunks: {
 			chunks: 'all',
