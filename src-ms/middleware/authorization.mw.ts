@@ -12,11 +12,8 @@ export const mwAuthorization = async (req: Request, res: Response, next: NextFun
 			`${URI_MS_AUTH}/tokens/verification`,
 			{ accessToken: token }
 		);
-		console.log(`data `, verifiedTokenData);
 		res.locals.jwt = verifiedTokenData.data?.payload?.payload;
 		res.locals.userId = verifiedTokenData.data?.payload?.payload.id;
-
-		console.log(res.locals);
 
 		return next();
 	} catch (error) {
