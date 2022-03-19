@@ -17,7 +17,6 @@ RUN yarn add prisma
 COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/.env.production ./.env
 COPY --from=builder /app/build .
-RUN yarn prisma migrate deploy
 EXPOSE ${MS_EXPRESS_PORT}
 
-CMD ["node", "/app/main.js"]
+CMD yarn prisma migrate deploy && node /app/main.js"
