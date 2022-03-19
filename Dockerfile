@@ -19,4 +19,5 @@ COPY --from=builder /app/.env.production ./.env
 COPY --from=builder /app/build .
 EXPOSE ${MS_EXPRESS_PORT}
 
-CMD yarn prisma generate && yarn prisma migrate deploy && node /app/main.js
+RUN yarn prisma generate
+CMD yarn prisma migrate deploy && node /app/main.js
