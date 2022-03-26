@@ -3,7 +3,7 @@ import { pick } from 'lodash';
 import { prisma } from '../../utils';
 import { logger } from '../../broker';
 import { MS_NAME } from '../../constants';
-import { BrokerMessageLog } from '@its/ms';
+import { BrokerMessageLog, MessageDTO } from '@its/ms';
 
 export const epSelfData = async (req: Request, res: Response) => {
 	const userId = res.locals.userId;
@@ -13,19 +13,19 @@ export const epSelfData = async (req: Request, res: Response) => {
 			where: { id: userId },
 		});
 
-		if (!userData) return res.status(404).json({ error: 'User not found' });
+		if (!userData) return res.status(404).json({ message: 'User not found' } as MessageDTO);
 
 		const data = pick(userData, ['id', 'email', 'name', 'username']);
 
-		return res.status(200).json({ payload: data });
+		return res.status(200).json({ message: 'user data', payload: data } as MessageDTO);
 	} catch (error) {
 		logger.send({
 			createdAt: new Date(),
-			description: `User with "${userId}" from JWT asked for self data but failed`,
+			description: `user "${userId}" asked for self data but failed`,
 			ms: MS_NAME,
 			data: error,
 		} as BrokerMessageLog);
 
-		return res.status(500).json({ payload: error });
+		return res.status(500).json({ message: 'internal server error', payload: error } as MessageDTO);
 	}
 };

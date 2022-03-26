@@ -4,6 +4,9 @@ import { omit, get } from 'lodash';
 import { Prisma } from '@prisma/client';
 import { SignUpReqDTO, SignUpReqDTOSchema } from '../../dto';
 import { prisma } from '../../utils';
+import { BrokerMessageLog, MessageDTO } from '@its/ms';
+import { logger } from '../../broker';
+import { BCRYPT_SALT_ROUNDS, MS_NAME } from '../../constants';
 
 export const epCreateUser = async (req: Request, res: Response) => {
 	// Validation
@@ -12,7 +15,7 @@ export const epCreateUser = async (req: Request, res: Response) => {
 	if (error) return res.status(400).json(error);
 
 	// Processing
-	const salt = await bcrypt.genSalt(10);
+	const salt = await bcrypt.genSalt(BCRYPT_SALT_ROUNDS);
 	const hash = await bcrypt.hash(signUpReq.password, salt);
 
 	try {
@@ -32,11 +35,12 @@ export const epCreateUser = async (req: Request, res: Response) => {
 
 		const userResponse = omit(user, ['password']);
 
-		return res.status(200).json({ payload: userResponse });
+		return res.status(200).json({
+			message: 'user data',
+			payload: userResponse,
+		} as MessageDTO);
 	} catch (err) {
 		if (err instanceof Prisma.PrismaClientKnownRequestError) {
-			// TODO: log
-
 			// unique email
 			if (err.code === 'P2002' && get(err, 'meta.target')?.[0] === 'email') {
 				return res.status(400).json({
@@ -59,6 +63,13 @@ export const epCreateUser = async (req: Request, res: Response) => {
 			});
 		}
 
-		return res.status(500).json({ payload: err });
+		logger.send({
+			createdAt: new Date(),
+			description: `cannot create a user`,
+			ms: MS_NAME,
+			data: error,
+		} as BrokerMessageLog);
+
+		return res.status(500).json({ message: 'internal server error', payload: error } as MessageDTO);
 	}
 };

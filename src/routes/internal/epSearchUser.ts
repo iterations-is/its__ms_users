@@ -1,6 +1,9 @@
 import { Request, Response } from 'express';
 import { UserSearchReqDTO, UserSearchReqDTOSchema } from '../../dto';
 import { prisma } from '../../utils';
+import { BrokerMessageLog, MessageDTO } from '@its/ms';
+import { logger } from '../../broker';
+import { MS_NAME } from '../../constants';
 
 export const epSearchUser = async (req: Request, res: Response) => {
 	// Validation
@@ -28,10 +31,17 @@ export const epSearchUser = async (req: Request, res: Response) => {
 			},
 		});
 
-		if (!user) return res.status(404).json({ message: 'user not found' });
+		if (!user) return res.status(404).json({ message: 'user not found' } as MessageDTO);
 
-		return res.status(200).json({ message: 'user data', payload: user });
+		return res.status(200).json({ message: 'user data', payload: user } as MessageDTO);
 	} catch (err) {
-		return res.status(500).json({ payload: err });
+		logger.send({
+			createdAt: new Date(),
+			description: `cannot find user`,
+			ms: MS_NAME,
+			data: error,
+		} as BrokerMessageLog);
+
+		return res.status(500).json({ message: 'internal server error', payload: error } as MessageDTO);
 	}
 };

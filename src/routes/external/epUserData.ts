@@ -1,8 +1,12 @@
 import { Request, Response } from 'express';
 import crypto from 'crypto';
 import { prisma } from '../../utils';
+import { logger } from '../../broker';
+import { MS_NAME } from '../../constants';
+import { BrokerMessageLog, MessageDTO } from '@its/ms';
 
 export const epUserData = async (req: Request, res: Response) => {
+	const userId = res.locals.userId;
 	const foreignUserId = req.params.userId;
 
 	try {
@@ -21,7 +25,10 @@ export const epUserData = async (req: Request, res: Response) => {
 			},
 		});
 
-		if (!userData) return res.status(404).json({ error: 'User not found' });
+		if (!userData)
+			return res.status(404).json({
+				error: 'User not found',
+			} as MessageDTO);
 
 		const gravatar = crypto.createHash('md5').update(userData.email).digest('hex');
 
@@ -31,7 +38,14 @@ export const epUserData = async (req: Request, res: Response) => {
 				gravatar: `https://www.gravatar.com/avatar/${gravatar}`,
 			},
 		});
-	} catch (err) {
-		return res.status(500).json({ payload: err });
+	} catch (error) {
+		logger.send({
+			createdAt: new Date(),
+			description: `user "${userId}" asked for data of user "${foreignUserId}" but failed`,
+			ms: MS_NAME,
+			data: error,
+		} as BrokerMessageLog);
+
+		return res.status(500).json({ message: 'internal server error', payload: error } as MessageDTO);
 	}
 };
