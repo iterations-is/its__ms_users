@@ -1,4 +1,4 @@
-export interface Message {
+export interface MessageDTO {
 	// Unique identifier for the event (MS independent)
 	code?: string;
 	// Description

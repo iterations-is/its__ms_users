@@ -1,11 +1,9 @@
 import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
-import { omit } from 'lodash';
-import { Prisma, PrismaClient } from '@prisma/client';
-
+import { omit, get } from 'lodash';
+import { Prisma } from '@prisma/client';
 import { SignUpReqDTO, SignUpReqDTOSchema } from '../../dto';
-
-const prisma = new PrismaClient();
+import { prisma } from '../../utils';
 
 export const epCreateUser = async (req: Request, res: Response) => {
 	// Validation
@@ -37,11 +35,28 @@ export const epCreateUser = async (req: Request, res: Response) => {
 		return res.status(200).json({ payload: userResponse });
 	} catch (err) {
 		if (err instanceof Prisma.PrismaClientKnownRequestError) {
-			// TODO: special error cases
-			// Not unique email
-			// Not unique username
-			// Invalid password
-			return res.status(400).json({ payload: err });
+			// TODO: log
+
+			// unique email
+			if (err.code === 'P2002' && get(err, 'meta.target')?.[0] === 'email') {
+				return res.status(400).json({
+					code: 'UNIQUE_EMAIL',
+					message: 'email already exists',
+				});
+			}
+
+			// unique username
+			if (err.code === 'P2002' && get(err, 'meta.target')?.[0] === 'username') {
+				return res.status(400).json({
+					code: 'UNIQUE_USERNAME',
+					message: 'username already exists',
+				});
+			}
+
+			return res.status(400).json({
+				message: 'cannot create new user',
+				payload: err,
+			});
 		}
 
 		return res.status(500).json({ payload: err });

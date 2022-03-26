@@ -16,6 +16,9 @@ module.exports = {
 	},
 	resolve: {
 		extensions: ['.ts', '.js'],
+		alias: {
+			'@its/ms': path.resolve(__dirname, 'src-ms'),
+		},
 	},
 	output: {
 		filename: '[name].js',

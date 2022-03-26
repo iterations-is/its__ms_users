@@ -1,9 +1,8 @@
 import { Request, Response } from 'express';
 import { UpdatePasswordReqDTO, UpdatePasswordReqDTOSchema } from '../../dto';
 import bcrypt from 'bcryptjs';
-import { Prisma, PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { Prisma } from '@prisma/client';
+import { prisma } from '../../utils';
 
 export const epUpdatePassword = async (req: Request, res: Response) => {
 	// Validation

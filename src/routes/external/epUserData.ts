@@ -1,12 +1,7 @@
 import { Request, Response } from 'express';
-import { PrismaClient } from '@prisma/client';
 import crypto from 'crypto';
+import { prisma } from '../../utils';
 
-const prisma = new PrismaClient();
-
-/**
- * Requires mwAuthorization
- */
 export const epUserData = async (req: Request, res: Response) => {
 	const foreignUserId = req.params.userId;
 

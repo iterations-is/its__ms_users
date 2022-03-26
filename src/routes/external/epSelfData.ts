@@ -1,12 +1,10 @@
 import { Request, Response } from 'express';
-import { PrismaClient } from '@prisma/client';
 import { pick } from 'lodash';
+import { prisma } from '../../utils';
+import { logger } from '../../broker';
+import { MS_NAME } from '../../constants';
+import { BrokerMessageLog } from '@its/ms';
 
-const prisma = new PrismaClient();
-
-/**
- * Requires mwAuthorization
- */
 export const epSelfData = async (req: Request, res: Response) => {
 	const userId = res.locals.userId;
 
@@ -17,10 +15,17 @@ export const epSelfData = async (req: Request, res: Response) => {
 
 		if (!userData) return res.status(404).json({ error: 'User not found' });
 
-		const data = pick(userData, ['email', 'name', 'username']);
+		const data = pick(userData, ['id', 'email', 'name', 'username']);
 
 		return res.status(200).json({ payload: data });
-	} catch (err) {
-		return res.status(500).json({ payload: err });
+	} catch (error) {
+		logger.send({
+			createdAt: new Date(),
+			description: `User with "${userId}" from JWT asked for self data but failed`,
+			ms: MS_NAME,
+			data: error,
+		} as BrokerMessageLog);
+
+		return res.status(500).json({ payload: error });
 	}
 };

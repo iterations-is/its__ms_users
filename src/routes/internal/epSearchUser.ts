@@ -1,9 +1,6 @@
 import { Request, Response } from 'express';
-import { Prisma, PrismaClient } from '@prisma/client';
-
 import { UserSearchReqDTO, UserSearchReqDTOSchema } from '../../dto';
-
-const prisma = new PrismaClient();
+import { prisma } from '../../utils';
 
 export const epSearchUser = async (req: Request, res: Response) => {
 	// Validation
@@ -17,19 +14,24 @@ export const epSearchUser = async (req: Request, res: Response) => {
 			where: {
 				...userSearchReq,
 			},
+			select: {
+				id: true,
+				name: true,
+				email: true,
+				password: true,
+				username: true,
+				role: {
+					select: {
+						name: true,
+					},
+				},
+			},
 		});
 
 		if (!user) return res.status(404).json({ message: 'user not found' });
 
 		return res.status(200).json({ message: 'user data', payload: user });
 	} catch (err) {
-		if (err instanceof Prisma.PrismaClientKnownRequestError) {
-			// TODO: special error cases
-			// Not unique email
-			// Not unique username
-			// Invalid password
-		}
-
-		return res.status(400).json({ payload: err });
+		return res.status(500).json({ payload: err });
 	}
 };
