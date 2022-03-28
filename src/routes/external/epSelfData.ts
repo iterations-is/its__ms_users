@@ -1,5 +1,4 @@
 import { Request, Response } from 'express';
-import { pick } from 'lodash';
 import { prisma } from '../../utils';
 import { logger } from '../../broker';
 import { MS_NAME } from '../../constants';
@@ -11,13 +10,22 @@ export const epSelfData = async (req: Request, res: Response) => {
 	try {
 		const userData = await prisma.user.findUnique({
 			where: { id: userId },
+			select: {
+				id: true,
+				name: true,
+				email: true,
+				username: true,
+				role: {
+					select: {
+						name: true,
+					},
+				},
+			},
 		});
 
 		if (!userData) return res.status(404).json({ message: 'User not found' } as MessageDTO);
 
-		const data = pick(userData, ['id', 'email', 'name', 'username']);
-
-		return res.status(200).json({ message: 'user data', payload: data } as MessageDTO);
+		return res.status(200).json({ message: 'user data', payload: userData } as MessageDTO);
 	} catch (error) {
 		logger.send({
 			createdAt: new Date(),
