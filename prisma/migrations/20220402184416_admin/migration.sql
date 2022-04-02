@@ -1,0 +1,1 @@
+INSERT INTO "its-ms-users"."User" (id, name, email, password, "roleId", username) VALUES ('a604388c-c434-442c-9f7e-49b31920ded2', 'admin', 'admin@example.com', '$2a$10$40hpXnNd8v5.17JHBKbWk..RinYBvOtsJXfZvNCambuMFMFqPzES6', '91f40d25-2ebf-4525-a2f4-11fcdecbcb7b', 'admin');
