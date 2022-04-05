@@ -31,6 +31,17 @@ export const epCreateUser = async (req: Request, res: Response) => {
 					},
 				},
 			},
+			select: {
+				id: true,
+				name: true,
+				email: true,
+				username: true,
+				role: {
+					select: {
+						name: true,
+					},
+				},
+			},
 		});
 
 		const userResponse = omit(user, ['password']);
